@@ -1,0 +1,896 @@
+/* tri-3d-pub-floorplan — CSS ported from reference.html (variables / grid layout / grouped buttons / sidebars / footer / fab / toast).
+   Difference from the reference page: the tri-container canvas sits in the main area, with the 2D SVG and 3D canvas cross-fading. */
+
+:root {
+    --bg: #f3efe7;
+    --paper: #f7f4ee;
+    --panel: #fffdf9;
+    --line: #e3dccf;
+    --ink: #2b2824;
+    --muted: #8a8174;
+    --accent: #b5653a;
+    --accent-soft: #f3e3d8;
+    --teal: #2f5d62;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+    margin: 0;
+    height: 100%;
+    background: var(--bg);
+    color: var(--ink);
+    overflow: hidden;
+    overscroll-behavior: none;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    font: 13px/1.5 -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+}
+
+button,
+input,
+select {
+    font: inherit;
+    color: inherit;
+}
+
+input {
+    -webkit-user-select: text;
+    user-select: text;
+}
+
+/* ============ Layout (reference page .app grid) ============ */
+
+.app {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) 30px;
+    grid-template-columns: 236px minmax(0, 1fr) 300px;
+    height: 100vh;
+    /* background shown during loading (before engine ready) matches the canvas / 2D paper to avoid a gray flash */
+    background: var(--paper);
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+}
+
+/* main area: wraps the tri-container (canvas container) + fab/scalebar/modehint.
+   The fab etc. must not go inside tri-container — EventManager's setPointerCapture on the container hijacks button clicks */
+.stage-wrap {
+    grid-row: 2;
+    grid-column: 2;
+    position: relative;
+    overflow: hidden;
+    background: var(--paper);
+}
+
+.tri-container {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: var(--paper);
+}
+
+/* ============ header ============ */
+
+header {
+    grid-column: 1/-1;
+    grid-row: 1;
+    z-index: 6;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    padding: 8px 14px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--line);
+}
+
+.brand {
+    display: flex;
+    flex-direction: column;
+    margin-right: 8px;
+    line-height: 1.25;
+}
+
+.brand b {
+    font-size: 15px;
+    letter-spacing: 0.5px;
+}
+
+.brand span {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.grp {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 2px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+}
+
+.btn {
+    border: 0;
+    background: transparent;
+    padding: 5px 9px;
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.btn:hover {
+    background: #f2ece2;
+}
+
+.btn.on {
+    background: var(--ink);
+    color: #fff;
+}
+
+.btn.chip.on {
+    background: var(--accent-soft);
+    color: var(--accent);
+}
+
+.btn.primary {
+    background: var(--accent);
+    color: #fff;
+}
+
+.btn.primary:hover {
+    background: #9f5530;
+}
+
+.btn.danger {
+    color: #b3372a;
+}
+
+.spacer {
+    flex: 1;
+}
+
+/* seg switcher (same pill as the reference page) */
+.seg {
+    position: relative;
+    padding: 3px;
+}
+
+.seg .btn {
+    position: relative;
+    z-index: 1;
+    width: 82px;
+    transition: color 0.45s;
+}
+
+.seg .btn:hover {
+    background: transparent;
+}
+
+.seg .btn.light {
+    color: #fff;
+}
+
+.seg .pill {
+    position: absolute;
+    left: 3px;
+    top: 3px;
+    bottom: 3px;
+    width: 82px;
+    border-radius: 6px;
+    background: var(--accent);
+    box-shadow: 0 2px 6px rgba(181, 101, 58, 0.35);
+    transition: transform 0.5s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.seg.busy {
+    pointer-events: none;
+}
+
+/* Language group */
+#langSel .btn {
+    min-width: 32px;
+    font-weight: 500;
+}
+
+/* File menu */
+.menu {
+    position: relative;
+}
+
+.menu summary {
+    list-style: none;
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 8px;
+    padding: 6px 12px;
+    cursor: pointer;
+}
+
+.menu summary::-webkit-details-marker {
+    display: none;
+}
+
+.menu-pop {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 6px);
+    display: flex;
+    flex-direction: column;
+    min-width: 150px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 4px;
+    box-shadow: 0 10px 30px rgba(40, 30, 20, 0.14);
+    z-index: 20;
+}
+
+.menu-pop .btn {
+    text-align: left;
+}
+
+/* ============ aside sidebars ============ */
+
+aside {
+    background: var(--panel);
+    overflow: auto;
+    border-right: 1px solid var(--line);
+    grid-row: 2;
+}
+
+aside.lib {
+    grid-column: 1;
+}
+
+aside.right {
+    grid-column: 3;
+    border-right: 0;
+    border-left: 1px solid var(--line);
+}
+
+.lib h4 {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    margin: 0;
+    padding: 12px 14px 6px;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 600;
+    letter-spacing: 1px;
+    background: var(--panel);
+}
+
+.lib-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    padding: 0 10px 6px;
+}
+
+.item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 8px 4px 6px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    cursor: grab;
+    user-select: none;
+    touch-action: pan-y;
+    transition: border-color 0.15s, transform 0.15s;
+}
+
+.item.dragging {
+    border-color: var(--accent);
+    opacity: 0.5;
+}
+
+@media (hover: hover) {
+    .item:hover {
+        border-color: var(--accent);
+        transform: translateY(-1px);
+    }
+}
+
+.item svg {
+    width: 56px;
+    height: 44px;
+}
+
+.item b {
+    font-weight: 500;
+    font-size: 12px;
+}
+
+.item small {
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.hint {
+    padding: 10px 14px 16px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+/* roomList (3D room list) */
+#roomList {
+    padding: 0 10px 6px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+}
+
+#roomList button {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    border: 1px solid var(--line);
+    background: #fff;
+    padding: 5px 8px;
+    border-radius: 7px;
+    cursor: pointer;
+    text-align: left;
+    line-height: 1.3;
+}
+
+#roomList button:hover {
+    background: #f2ece2;
+}
+
+#roomList small {
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ============ Right panel ============ */
+
+#panel section {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+}
+
+#panel h3 {
+    margin: 0 0 8px;
+    font-size: 13px;
+}
+
+#panel h3 small {
+    color: var(--muted);
+    font-weight: 400;
+    margin-left: 6px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums;
+}
+
+td {
+    padding: 4px 2px;
+    border-bottom: 1px dashed #eee6d9;
+}
+
+td.r {
+    text-align: right;
+}
+
+tr.click {
+    cursor: pointer;
+}
+
+tr.click:hover td {
+    background: #faf5ee;
+}
+
+.sw {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    vertical-align: -2px;
+    margin-right: 6px;
+}
+
+.total {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 14px;
+}
+
+.total b {
+    color: var(--accent);
+}
+
+.muted {
+    color: var(--muted);
+}
+
+.form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.form label {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.form label.full {
+    grid-column: 1/-1;
+}
+
+.form input,
+.form select {
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 5px 7px;
+    background: #fff;
+    width: 100%;
+}
+
+.form input[type=color] {
+    padding: 2px;
+    height: 30px;
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.actions .btn {
+    border: 1px solid var(--line);
+    background: #fff;
+}
+
+.mats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+}
+
+.mat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 6px;
+    background: #fff;
+    cursor: pointer;
+    text-align: left;
+}
+
+.mat.on {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+.mat i {
+    width: 26px;
+    height: 26px;
+    border-radius: 5px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    flex: none;
+}
+
+.mat span {
+    font-size: 12px;
+    line-height: 1.3;
+}
+
+.mat small {
+    display: block;
+    color: var(--muted);
+}
+
+.kbd {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 3px 10px;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+kbd {
+    font: 11px ui-monospace, Menlo, monospace;
+    background: #f2ece2;
+    border: 1px solid var(--line);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    padding: 0 5px;
+    color: var(--ink);
+}
+
+.big {
+    font-size: 22px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.stats div {
+    background: #faf6ef;
+    border-radius: 8px;
+    padding: 8px;
+}
+
+.stats small {
+    display: block;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+/* ============ footer ============ */
+
+footer {
+    grid-column: 1/-1;
+    grid-row: 3;
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    padding: 0 14px;
+    background: var(--panel);
+    overflow: hidden;
+    white-space: nowrap;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+}
+
+footer b {
+    color: var(--ink);
+    font-weight: 500;
+}
+
+#tip {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ============ Floating toolbar (fab) ============ */
+
+#fab {
+    position: absolute;
+    left: 50%;
+    bottom: 16px;
+    transform: translate(-50%, 12px);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px;
+    background: rgba(255, 253, 249, 0.97);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: 0 8px 26px rgba(40, 30, 20, 0.16);
+    z-index: 4;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s, transform 0.2s, visibility 0s linear 0.2s;
+    max-width: calc(100% - 24px);
+}
+
+#fab.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0);
+    transition: opacity 0.2s, transform 0.2s;
+}
+
+#fab .name {
+    padding: 0 8px 0 6px;
+    font-weight: 600;
+    max-width: 9em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#fab .btn {
+    border: 1px solid transparent;
+}
+
+#fab .sep {
+    width: 1px;
+    align-self: stretch;
+    margin: 4px 2px;
+    background: var(--line);
+}
+
+/* ============ Scale bar / mode hint / toast ============ */
+
+.scalebar {
+    position: absolute;
+    left: 14px;
+    bottom: 12px;
+    z-index: 2;
+    background: rgba(255, 253, 249, 0.92);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 12px;
+    pointer-events: none;
+}
+
+.scalebar .bar {
+    height: 6px;
+    border: 1.5px solid var(--ink);
+    border-top: 0;
+    margin-top: 3px;
+}
+
+.modehint {
+    position: absolute;
+    left: 50%;
+    top: 12px;
+    transform: translateX(-50%);
+    background: var(--ink);
+    color: #fff;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.modehint.show {
+    opacity: 0.9;
+}
+
+.toast {
+    position: fixed;
+    left: 50%;
+    bottom: 110px;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--ink);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    opacity: 0;
+    transition: 0.25s;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%);
+}
+
+/* ============ Sunlight slider ============ */
+
+.range {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 8px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.range input {
+    width: 100px;
+    accent-color: var(--accent);
+}
+
+.range span {
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+}
+
+/* ============ 2D SVG layer / 3D canvas stacking ============ */
+
+/* 2D SVG editor: absolutely fills the main area, z2; 3D canvas z3 (covers it when opaque) */
+.fp-view2d {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: var(--paper);
+}
+
+.fp-view2d svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    touch-action: none;
+    cursor: default;
+}
+
+.fp-view2d svg.fp-tool-measure {
+    cursor: crosshair;
+}
+
+.fp-view2d svg.fp-tool-select .furn {
+    cursor: move;
+}
+
+.tri-container canvas {
+    position: absolute;
+    inset: 0;
+    z-index: 3; /* above the 2D SVG layer (z2): the 3D view covers the plan once opaque */
+    transition: opacity 0.42s ease;
+}
+
+/* ============ 3D room-name labels (LabelLayerPlugin .rlabel, same style as the reference page's CSS2D) ============ */
+
+.rlabel {
+    font-size: 12px;
+    font-weight: 600;
+    color: #2b2824;
+    background: rgba(255, 253, 249, 0.9);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 2px 9px;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.rlabel small {
+    font-weight: 400;
+    color: var(--muted);
+    margin-left: 4px;
+}
+
+/* ============ Library drag ghost image (reference page #ghost) ============ */
+
+.fp-lib-ghost {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 30;
+    pointer-events: none;
+    opacity: 0.8;
+    transform: translate(-50%, -50%);
+    filter: drop-shadow(0 4px 10px rgba(40, 30, 20, 0.3));
+}
+
+.fp-lib-ghost svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    overflow: visible;
+}
+
+/* ============ Wide screens: side panels collapsible (reference page hide-lib / hide-panel) ============ */
+
+/* 2D/3D-specific group visibility (reference page body.m3d toggle) */
+.app.in3d .only2d {
+    display: none !important;
+}
+
+.app:not(.in3d) .only3d {
+    display: none !important;
+}
+
+.only2d,
+.only3d {
+    animation: fadeIn 0.45s ease both;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@media (min-width: 1101px) {
+    .app {
+        transition: grid-template-columns 0.3s cubic-bezier(0.3, 0.7, 0.3, 1);
+    }
+
+    .app.hide-lib {
+        grid-template-columns: 0 minmax(0, 1fr) 300px;
+    }
+
+    .app.hide-panel {
+        grid-template-columns: 236px minmax(0, 1fr) 0;
+    }
+
+    .app.hide-lib.hide-panel {
+        grid-template-columns: 0 minmax(0, 1fr) 0;
+    }
+
+    .app.hide-lib aside.lib,
+    .app.hide-panel aside.right {
+        overflow: hidden;
+        border: 0;
+    }
+
+    aside {
+        overflow-x: hidden;
+    }
+
+    aside.lib > div {
+        min-width: 220px;
+    }
+
+    #panel {
+        min-width: 284px;
+    }
+}
+
+/* ============ Narrow screens: sidebars become drawers (simplified: hide sidebars entirely, toggle via the header) ============ */
+
+@media (max-width: 1100px) {
+    .app {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .tri-container,
+    aside.lib,
+    aside.right {
+        grid-row: 2;
+        grid-column: 1;
+    }
+
+    aside.lib,
+    aside.right {
+        position: absolute;
+        z-index: 6;
+        width: min(320px, 86vw);
+        top: 0;
+        bottom: 30px;
+        transition: transform 0.3s cubic-bezier(0.3, 0.7, 0.3, 1), box-shadow 0.3s;
+    }
+
+    aside.lib {
+        left: 0;
+        transform: translateX(-110%);
+    }
+
+    aside.right {
+        right: 0;
+        transform: translateX(110%);
+    }
+
+    .app:not(.hide-lib) aside.lib {
+        transform: none;
+        box-shadow: 0 0 30px rgba(40, 30, 20, 0.18);
+    }
+
+    .app:not(.hide-panel) aside.right {
+        transform: none;
+        box-shadow: 0 0 30px rgba(40, 30, 20, 0.18);
+    }
+
+    .brand span,
+    footer span[v-show] {
+        display: none;
+    }
+}

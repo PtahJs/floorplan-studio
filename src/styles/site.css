@@ -1,0 +1,308 @@
+/* Marketing site styles (home / pricing / login / signup + site nav), appended after index.css.
+   Colors reuse the warm-paper variables from index.css :root; the editor route (/app) never hits these rules. */
+
+/* Editor locks scrolling; marketing pages unlock it (the global overflow:hidden+height:100% on html/body/#app
+   comes from index.css — all three layers must unlock or content stays clipped; the scrollbar lives only on
+   the html layer, body/#app use visible to prevent nested scrolling) */
+html:has(.site) {
+    overflow: auto;
+    height: auto;
+    touch-action: pan-y;
+}
+body:has(.site),
+#app:has(.site) {
+    overflow: visible;
+    height: auto;
+}
+
+/* ============ Site navigation ============ */
+.site-nav {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 14px 4vw;
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+.site-nav .brand {
+    font-weight: 800;
+    font-size: 19px;
+    letter-spacing: 0.2px;
+    color: var(--ink);
+    text-decoration: none;
+}
+.site-nav .brand span { color: var(--accent); }
+.site-nav nav { display: flex; gap: 16px; }
+.site-nav nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 14.5px;
+    padding: 6px 4px;
+    border-radius: 6px;
+}
+.site-nav nav a.router-link-active { color: var(--ink); font-weight: 600; }
+.site-nav .btn { text-decoration: none; font-size: 14px; padding: 8px 16px; white-space: nowrap; }
+.site-nav .spacer { flex: 1; }
+
+/* ============ Button system (marketing variant, same .btn name as the editor but independently defined) ============ */
+.site .btn,
+.site-nav .btn {
+    display: inline-block;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 22px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    background: var(--panel);
+    color: var(--ink);
+}
+.site .btn:hover, .site-nav .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(43, 40, 36, 0.08); }
+.site .btn.solid, .site-nav .btn.solid {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+}
+.site .btn.ghost, .site-nav .btn.ghost { background: transparent; }
+.site .btn.big { padding: 14px 30px; font-size: 16.5px; }
+
+/* ============ Page container ============ */
+.site {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 4vw 72px;
+    overflow: visible;
+}
+.site h1 { font-size: clamp(34px, 5.4vw, 58px); line-height: 1.08; margin: 12px 0 18px; letter-spacing: -0.5px; }
+.site h1 em { color: var(--accent); font-style: normal; }
+.site h2 { font-size: clamp(24px, 3.4vw, 34px); margin: 0 0 12px; letter-spacing: -0.3px; }
+.site .sub { font-size: 18px; color: var(--muted); max-width: 640px; line-height: 1.6; margin: 0 0 26px; }
+.site section { padding: 56px 0 0; }
+
+/* ============ Home hero ============ */
+.hero { padding-top: 64px; }
+.eyebrow {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--teal);
+    background: rgba(47, 93, 98, 0.08);
+    border-radius: 99px;
+    padding: 5px 14px;
+    margin: 0 0 6px;
+}
+.cta-row { display: flex; gap: 14px; flex-wrap: wrap; margin: 10px 0 8px; }
+.fine { font-size: 13px; color: var(--muted); }
+
+.hero-shot {
+    margin-top: 44px;
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: 18px;
+    align-items: stretch;
+}
+.shot {
+    border-radius: 16px;
+    border: 1px solid var(--line);
+    min-height: 280px;
+    overflow: hidden;
+    box-shadow: 0 12px 36px rgba(43, 40, 36, 0.07);
+}
+.shot.paper { background: var(--paper); display: grid; place-items: center; padding: 18px; }
+.plan-doodle { width: 100%; height: auto; }
+.shot.dark { background: #1c2130; position: relative; }
+
+/* Fake 3D hut (pure CSS geometry, hinting at the 3D mode) */
+.fake3d { position: absolute; inset: 0; perspective: 700px; overflow: hidden; }
+.fake3d .floor {
+    position: absolute; left: 8%; right: 8%; top: 58%; bottom: 12%;
+    background: linear-gradient(160deg, #3a4356 0%, #2a3040 100%);
+    transform: rotateX(58deg);
+    border: 1px solid #4a5468;
+}
+.fake3d .wall {
+    position: absolute; background: #e8e2d4; border: 1px solid #cfc6b2;
+}
+.fake3d .w1 { left: 8%; top: 22%; width: 12%; height: 46%; transform: rotateY(52deg); transform-origin: left; }
+.fake3d .w2 { right: 8%; top: 22%; width: 12%; height: 46%; transform: rotateY(-52deg); transform-origin: right; }
+.fake3d .w3 { left: 17%; top: 14%; right: 17%; height: 18%; }
+.fake3d .box {
+    position: absolute; background: var(--accent); border-radius: 3px;
+    box-shadow: 0 10px 14px rgba(0, 0, 0, 0.35);
+}
+.fake3d .b1 { left: 30%; top: 52%; width: 16%; height: 12%; }
+.fake3d .b2 { left: 56%; top: 58%; width: 10%; height: 8%; background: #7fa07c; }
+
+/* ============ Feature cards ============ */
+.features .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+    margin-top: 26px;
+}
+.card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 22px 22px 18px;
+}
+.card .icon { font-size: 26px; margin-bottom: 8px; }
+.card h3 { margin: 0 0 8px; font-size: 16.5px; }
+.card p { margin: 0; color: var(--muted); line-height: 1.62; font-size: 14.5px; }
+
+/* ============ Three-step flow ============ */
+.steps ol {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    padding: 0;
+    margin: 26px 0 0;
+    counter-reset: step;
+}
+.steps li {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 22px;
+    position: relative;
+}
+.steps .n {
+    display: inline-grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+.steps h3 { margin: 0 0 8px; font-size: 16.5px; }
+.steps p { margin: 0; color: var(--muted); line-height: 1.6; font-size: 14.5px; }
+
+/* ============ Final CTA ============ */
+.final-cta {
+    text-align: center;
+    background: var(--accent-soft);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 48px 24px 40px !important;
+    margin-top: 64px;
+}
+.final-cta .btn { margin-top: 10px; }
+
+/* ============ Pricing page ============ */
+.pricing-head { text-align: center; padding-top: 56px; }
+.pricing-head .sub { margin: 0 auto 8px; }
+.tiers {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 18px;
+    align-items: start;
+    margin-top: 30px;
+}
+.tier {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 26px 26px 22px;
+    position: relative;
+}
+.tier.featured { border-color: var(--accent); box-shadow: 0 14px 36px rgba(181, 101, 58, 0.14); }
+.tier .tag {
+    position: absolute;
+    top: -12px;
+    left: 24px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    border-radius: 99px;
+    padding: 4px 12px;
+    margin: 0;
+}
+.tier h2 { margin: 0 0 4px; font-size: 20px; }
+.tier .price { margin: 0 0 16px; }
+.tier .amount { font-size: 38px; font-weight: 800; letter-spacing: -1px; }
+.tier .per { color: var(--muted); font-size: 14px; }
+.tier .btn { width: 100%; margin-bottom: 16px; }
+.tier ul { list-style: none; padding: 0; margin: 0; }
+.tier li { padding: 7px 0 7px 24px; position: relative; font-size: 14.5px; border-top: 1px dashed var(--line); }
+.tier li:first-child { border-top: none; }
+.tier li::before { content: "✓"; position: absolute; left: 2px; color: var(--teal); font-weight: 700; }
+
+/* ============ FAQ ============ */
+.faq { max-width: 720px; }
+.faq details {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 20px;
+    margin-top: 12px;
+}
+.faq summary { cursor: pointer; font-weight: 600; font-size: 15.5px; }
+.faq details[open] summary { margin-bottom: 8px; }
+.faq p { margin: 0; color: var(--muted); line-height: 1.62; font-size: 14.5px; }
+
+/* ============ Login / signup ============ */
+.auth-wrap { display: grid; place-items: start center; padding-top: 8vh; }
+.auth-card {
+    width: min(420px, 92vw);
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 34px 34px 26px;
+    box-shadow: 0 16px 44px rgba(43, 40, 36, 0.09);
+}
+.auth-card h1 { font-size: 26px; margin: 0 0 6px; }
+.auth-card .sub { font-size: 14.5px; margin: 0 0 20px; }
+.auth-card label { display: block; font-size: 13.5px; font-weight: 600; margin: 14px 0 6px; }
+.auth-card input {
+    width: 100%;
+    margin-top: 5px;
+    padding: 11px 13px;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    font-size: 15px;
+    background: var(--paper);
+    color: var(--ink);
+    outline: none;
+}
+.auth-card input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.auth-card .btn { width: 100%; margin-top: 20px; }
+.auth-card .err { color: #b03a2e; font-size: 13.5px; margin: 10px 0 0; }
+.auth-card .alt { text-align: center; font-size: 14px; margin: 16px 0 0; }
+.auth-card .alt a { color: var(--accent); font-weight: 600; text-decoration: none; }
+
+/* ============ Footer ============ */
+.site-foot {
+    max-width: 1120px;
+    margin: 26px auto 0;
+    padding: 18px 4vw 26px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    color: var(--muted);
+    font-size: 13.5px;
+}
+.site-foot a { color: var(--muted); text-decoration: none; }
+.site-foot a:hover { color: var(--accent); }
+
+/* ============ Responsive ============ */
+@media (max-width: 760px) {
+    .hero-shot { grid-template-columns: 1fr; }
+    .site-nav nav { display: none; }
+    .site-nav .btn.ghost { display: none; }
+}
